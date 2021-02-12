@@ -1,9 +1,13 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+from tqdm import tqdm
+import time
 
 import re
 import os
 import csv
+
 
 from utils import cleaner
 
@@ -26,22 +30,26 @@ options.add_argument("window-size=1920x1080")
 options.add_argument("disable-gpu")
 # options.add_argument("--disable-gpu")
 
-# Open driver
-driver = webdriver.Chrome(executable_path=chrome_path, options=options)
+# Install and open driver with proper version
+driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+# driver = webdriver.Chrome(executable_path=chrome_path, options=options)
 
 with open("data/petition/petition_url_list.csv", "w", encoding="utf8", newline="") as f:
     writer = csv.writer(f)
     writer.writerow(["url", "category", "title", "expired_date", "count"])
 
-    for page in page_list:
+    for page in tqdm(page_list):
         driver.get(page)
         driver.implicitly_wait(3)
+        time.sleep(1.5)
         html = driver.page_source
         soup = BeautifulSoup(html, "lxml")
         try:
-            for i in len(
-                soup.find("ul", class_="petition_list").find_all(
-                    "div", class_="bl_subject"
+            for i in range(
+                len(
+                    soup.find("ul", class_="petition_list").find_all(
+                        "div", class_="bl_subject"
+                    )
                 )
             ):
                 url = (
@@ -74,7 +82,7 @@ with open("data/petition/petition_url_list.csv", "w", encoding="utf8", newline="
                     .text
                 )
                 count = cleaner(count, mode="count")
-                writer.writerow(url, category, title, expired_date, count)
+                writer.writerow([url, category, title, expired_date, count])
         except AttributeError:
             print(page, i)
 

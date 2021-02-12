@@ -23,6 +23,7 @@ def cleaner(text, mode="general"):
 
     elif mode == "count":
         text = re.sub("참여인원 ", "", text)
+        text = re.sub("명", "", text)
         text = re.sub("\s{2,}|\"|'|\`|\,|\…|\.|\n|\t|\r|▲|【|】|▶|©|\*", "", text)
         return text
 
