@@ -40,8 +40,8 @@ with open("data/petition/petition_url_list.csv", "w", encoding="utf8", newline="
 
     for page in tqdm(page_list):
         driver.get(page)
-        driver.implicitly_wait(3)
-        time.sleep(1.5)
+        driver.implicitly_wait(60)
+        time.sleep(3)
         html = driver.page_source
         soup = BeautifulSoup(html, "lxml")
         try:
